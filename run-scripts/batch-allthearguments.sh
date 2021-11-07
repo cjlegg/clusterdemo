@@ -26,7 +26,7 @@
 
 # Extra over https://www.rc.ucl.ac.uk/docs/Example_Jobscripts/ follows:
 #$ -m be
-
+#$ -M j.legg.17@ucl.ac.uk
 
 # this file is expected to be called with [qsub] run-scripts/batch-allthearguments.sh [--args-file <path to arguments file>]
 
@@ -138,10 +138,12 @@ $PY_EXECUTABLE $PY_EXECUTABLE_ARGUMENTS
 
 # move files to longer term storage
 # need to supply a script to run after job is finished - these files no complete yet!
-cat << EOF > $RESULTS_FILE/gather_batch_job_stdout.sh
+cat <<EOF > $RESULTS_FILE/gather_batch_job_stdout.sh
 echo Check that all relevant files have been moved from /home/ucapcjg/Scratch/workspace/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.o${JOB_ID} $RESULTS_DIR/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.e${JOB_ID} $RESULTS_DIR/
+mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.po${JOB_ID} $RESULTS_DIR/
+mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.pe${JOB_ID} $RESULTS_DIR/
 EOF
 chmod +x $RESULTS_FILE/gather_batch_job_stdout.sh
 # drop any handy scripts in among the results files - e.g. a python notebook
