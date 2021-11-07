@@ -1,0 +1,7 @@
+# Suitable for a good first run, to check it is working
+catalyst=Pt
+# in Kelvin
+temperature=293
+biscults_per_pack=24
+# in miuntes
+timeout=5
