@@ -151,6 +151,8 @@ mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.o${JOB_ID} $RESULTS_DIR/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.e${JOB_ID} $RESULTS_DIR/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.po${JOB_ID} $RESULTS_DIR/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.pe${JOB_ID} $RESULTS_DIR/
+find $RESULTS_DIR -type f -exec chmod 0444 {} \;
+chmod +x $RESULTS_DIR/gather_batch_job_stdout.sh
 EOF
 chmod +x $RESULTS_DIR/gather_batch_job_stdout.sh
 
@@ -161,3 +163,5 @@ chmod +x $RESULTS_DIR/gather_batch_job_stdout.sh
 
 # preserve the results - mark read only
 find $RESULTS_DIR -type f -exec chmod 0444 {} \;
+chmod +x $RESULTS_DIR/gather_batch_job_stdout.sh
+

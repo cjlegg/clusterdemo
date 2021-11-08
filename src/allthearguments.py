@@ -78,7 +78,7 @@ if __name__ == '__main__':
     print('Gathering arguments...')
     arguments = arguments_from_environment(['ALLTHEARGUMENTS_DELIMITER'])
     delimiter = arguments['ALLTHEARGUMENTS_DELIMITER'] if 'ALLTHEARGUMENTS_DELIMITER' in os.environ.keys() else None
-    if delimiter is None: print('Environment variable ALLTHEARGUMENTS_DELIMITER not found, so code will use ':'., file=sys.stdout)
+    if delimiter is None: print("Environment variable ALLTHEARGUMENTS_DELIMITER not found, so code will use ':'.", file=sys.stdout)
     arguments['decided_delimiter'] = delimiter
     arguments.update(command_line_arguments)
     arguments.update(arguments_from_authorities())
