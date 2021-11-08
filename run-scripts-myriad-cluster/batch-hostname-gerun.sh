@@ -24,13 +24,13 @@
 
 # Extra over https://www.rc.ucl.ac.uk/docs/Example_Jobscripts/ follows:
 
-#$ -pe mpi 80
+#$ -pe mpi 4
 
 #$ -m be
 #$ -M j.legg.17@ucl.ac.uk
 
 
-# this file is expected to be called with [qsub] batch-hostname-gerun.sh <shape_letter> on Kathleen
+# this file is expected to be called with [qsub] batch-hostname-gerun.sh <shape_letter> on Myriad (shape-letter=(S|C)) 
 
 
 # retrieve some values and build a name for a results directory:
@@ -48,7 +48,7 @@ export RUN_AT="$(date +%Y%m%d-%H%M%S)-hostname"
 # beacuse the script has been copied by SGE
 # to somewhere under /var/opt/sge/localhost
 # export PROJECT_ROOT=$(dirname $(dirname $RUN_SCRIPT))
-export PROJECT_ROOT=/home/ucapcjg/clusterdemo/
+export PROJECT_ROOT=/home/ucapcjg/clusterdemo
 export RESULTS_DIR=$PROJECT_ROOT/results/run-at-$RUN_AT
 
 # provenance subdir will where the current environment values and run argument 
@@ -75,7 +75,7 @@ export ARGUMENTS_FILE=$PROJECT_ROOT/arguments/arg-set-1.txt
 # but another possibility would be to select the applicaiton program  
 if [[ $1 == 'S' ]]; then
     export SHAPE=square  # in this case the transformed argument will be passed through to the application program, but 
-elif [[ $1 == "C"]]; then
+elif [[ $1 == "C" ]]; then
     export SHAPE=circle
 fi
 
