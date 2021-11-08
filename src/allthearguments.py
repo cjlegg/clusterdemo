@@ -51,7 +51,7 @@ def arguments_from_parameter_files(filenames):
         for line in lines:
             parts = line.split(delimiter)
             if len(parts) == 2:
-                arguments[parts[0]] =parts[1]
+                arguments[parts[0]] =parts[1].strip()
     return arguments
 
 # some constants
