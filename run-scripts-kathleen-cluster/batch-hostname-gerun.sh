@@ -154,7 +154,7 @@ gerun $MPI_ARGS $PY_EXECUTABLE $PY_EXECUTABLE_ARGUMENTS
 
 # move files to longer term storage
 # need to supply a script to run after job is finished - these files no complete yet!
-cat <<EOF > $RESULTS_FILE/gather_batch_job_stdout.sh
+cat <<EOF > $RESULTS_DIR/gather_batch_job_stdout.sh
 echo Check that all relevant files have been moved from /home/ucapcjg/Scratch/workspace/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.o${JOB_ID} $RESULTS_DIR/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.e${JOB_ID} $RESULTS_DIR/
