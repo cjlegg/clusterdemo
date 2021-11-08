@@ -107,7 +107,9 @@ if [[ ! -z "$PE_HOSTFILE" ]]; then
 fi
 
 # application software:
+cd $PROJECT_ROOT
 git show > $RESULTS_DIR/provenance/git_show.log
+cd -
 
 # if executable file is a compliled code then could do this to record dynamic libraries in use
 # ldd <executable> > $RESULTS_DIR/provenance/ldd.log
