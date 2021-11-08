@@ -5,12 +5,12 @@
 #$ -l h_rt=0:10:0
 
 # Request 1 gigabyte of RAM (must be an integer followed by M, G, or T)
-#$ -l mem=1G
+#$ -l mem=3G
 
 # Request 15 gigabyte of TMPDIR space (default is 10 GB - remove if cluster is diskless)
 ##$ -l tmpfs=15G  # commented out - see below
 
-#$ -pe mpi 160
+#$ -pe smp 4
 
 # Set the name of the job.
 #$ -N alltheargs
@@ -41,7 +41,11 @@ export RUN_SCRIPT=$(readlink --canonicalize --no-newline $0)
 # --universal would give a UTC+0 time
 export RUN_AT="$(date +%Y%m%d-%H%M%S)-$(basename $RUN_SCRIPT)"
 
-export PROJECT_ROOT=$(dirname $(dirname $RUN_SCRIPT))
+# this does not work at runtime for batch job
+# beacuse the script has been copied by SGE
+# to somewhere under /var/opt/sge/localhost
+# export PROJECT_ROOT=$(dirname $(dirname $RUN_SCRIPT))
+export PROJECT_ROOT=/home/ucapcjg/clusterdemo/
 export RESULTS_DIR=$PROJECT_ROOT/results/run-at-$RUN_AT
 
 # provenance subdir will where the current environment values and run argument 
@@ -85,7 +89,7 @@ export PY_EXECUTABLE_ARGUMENTS="--arg-file $ARGUMENTS_FILE"
 # note some items of provenance
 #******************************************************************************
 # environment:
-module list > $RESULTS_DIR/provenance/modules.log
+module list 2> $RESULTS_DIR/provenance/modules.log
 env > $RESULTS_DIR/provenance/env.log
 # SGE environment variables 
 { for item in ARC  SGE_ROOT  SGE_BINARY_PATH SGE_CELL  SGE_JOB_SPOOL_DIR SGE_O_HOME  SGE_O_HOST  \
@@ -103,7 +107,7 @@ if [[ ! -z "$PE_HOSTFILE" ]]; then
 fi
 
 # application software:
-# TODO note git hash
+git show > $RESULTS_DIR/provenance/git_show.log
 
 # if executable file is a compliled code then could do this to record dynamic libraries in use
 # ldd <executable> > $RESULTS_DIR/provenance/ldd.log
@@ -123,13 +127,16 @@ cpuinfo > $RESULTS_DIR/provenance/cpuinfo.log
 ibstat > $RESULTS_DIR/provenance/ibstat.log
 ifconfig > $RESULTS_DIR/provenance/ifconfig.log
 
+# and set those all to read only
+chmod 0444 $RESULTS_DIR/provenance/*
+
 #******************************************************************************
 # finally launch the calculation
 #******************************************************************************
 echo "Now calling: $PY_EXECUTABLE $PY_EXECUTABLE_ARGUMENTS ..."
 {
 $PY_EXECUTABLE $PY_EXECUTABLE_ARGUMENTS
-} > $RESULTS_DIR/$(basename $RUN_SCRIPT).stdout.log 2> $RESULTS_DIR/$(basename $RUN_SCRIPT).stderr.log
+} > $RESULTS_DIR/$(basename $PY_EXECUTABLE).stdout.log 2> $RESULTS_DIR/$(basename $PY_EXECUTABLE).stderr.log
 
 # TODO - control where output files go.  e.g. with tee output
 
@@ -138,17 +145,19 @@ $PY_EXECUTABLE $PY_EXECUTABLE_ARGUMENTS
 
 # move files to longer term storage
 # need to supply a script to run after job is finished - these files no complete yet!
-cat <<EOF > $RESULTS_FILE/gather_batch_job_stdout.sh
+cat <<EOF > $RESULTS_DIR/gather_batch_job_stdout.sh
 echo Check that all relevant files have been moved from /home/ucapcjg/Scratch/workspace/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.o${JOB_ID} $RESULTS_DIR/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.e${JOB_ID} $RESULTS_DIR/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.po${JOB_ID} $RESULTS_DIR/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.pe${JOB_ID} $RESULTS_DIR/
 EOF
-chmod +x $RESULTS_FILE/gather_batch_job_stdout.sh
+chmod +x $RESULTS_DIR/gather_batch_job_stdout.sh
+
 # drop any handy scripts in among the results files - e.g. a python notebook
 
 
 # tidy up unwanted files.
 
-
+# preserve the results - mark read only
+find $RESULTS_DIR -type f -exec chmod 0444 {} \;
