@@ -39,7 +39,9 @@ export RUN_SCRIPT=$(readlink --canonicalize --no-newline $0)
 
 # directory name includes date for sorting by such in directory listings, and inlcudes name of this script for ID 
 # --universal would give a UTC+0 time
-export RUN_AT="$(date +%Y%m%d-%H%M%S)-$(basename $RUN_SCRIPT)"
+# $(basename $RUN_SCRIPT) gave here the job number because grid engine scheduler renamed its working
+# copy of this script with job number
+export RUN_AT="$(date +%Y%m%d-%H%M%S)-alltheargs"
 
 # this does not work at runtime for batch job
 # beacuse the script has been copied by SGE
