@@ -123,7 +123,7 @@ cd -
     mpirun --version
     which mpirun
 } > $RESULTS_DIR/provenance/mpirun.log
-cp $(which gerun) > $RESULTS_DIR/provenance/gerun
+cp $(which gerun) $RESULTS_DIR/provenance/gerun
 
 # save arguments of this script
 cp $ARGUMENTS_FILE $RESULTS_DIR/provenance/
