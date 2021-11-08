@@ -142,8 +142,6 @@ echo "Now calling: $PY_EXECUTABLE $PY_EXECUTABLE_ARGUMENTS ..."
 $PY_EXECUTABLE $PY_EXECUTABLE_ARGUMENTS
 } > $RESULTS_DIR/$(basename $PY_EXECUTABLE).stdout.log 2> $RESULTS_DIR/$(basename $PY_EXECUTABLE).stderr.log
 
-# TODO - control where output files go.  e.g. with tee output
-
 # run post processing - this example just uses the head node, so no mpirun
 
 

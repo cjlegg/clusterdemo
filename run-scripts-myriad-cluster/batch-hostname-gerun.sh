@@ -5,7 +5,7 @@
 #$ -l h_rt=0:10:0
 
 # Request 1 gigabyte of RAM (must be an integer followed by M, G, or T)
-#$ -l mem=1G
+#$ -l mem=10G
 
 # Request 15 gigabyte of TMPDIR space (default is 10 GB - remove if cluster is diskless)
 ##$ -l tmpfs=15G  # commented out - see below
@@ -16,17 +16,21 @@
 # Set the working directory to somewhere in your scratch space.  
 #  This is a necessary step as compute nodes cannot write to $HOME.
 # Replace "<your_UCL_id>" with your UCL user ID.
-#$ -wd /home/<your_UCL_id>/Scratch/workspace
+##$ -wd /home/<your_UCL_id>/Scratch/workspace
+#$ -wd /home/ucapcjg/Scratch/workspace 
 
 # Your work should be done in $TMPDIR 
 # cd $TMPDIR  # commented out because on Kathleen there are no local disks, so there is no $TMPDIR
 
 # Extra over https://www.rc.ucl.ac.uk/docs/Example_Jobscripts/ follows:
-#$ -M j.legg.17@ucl.ac.uk
+
+#$ -pe mpi 80
+
 #$ -m be
+#$ -M j.legg.17@ucl.ac.uk
 
 
-# this file is expected to be called with [qsub] batch-hostname-gerun.sh <shape_letter>
+# this file is expected to be called with [qsub] batch-hostname-gerun.sh <shape_letter> on Kathleen
 
 
 # retrieve some values and build a name for a results directory:
@@ -36,9 +40,15 @@ export RUN_SCRIPT=$(readlink --canonicalize --no-newline $0)
 
 # directory name includes date for sorting by such in directory listings, and inlcudes name of this script for ID 
 # --universal would give a UTC+0 time
-export RUN_AT="$(date +%Y%m%d-%H%M%S)-$(basename $RUN_SCRIPT)"
+# $(basename $RUN_SCRIPT) gave here the job number because grid engine scheduler renamed its working
+# copy of this script with job number
+export RUN_AT="$(date +%Y%m%d-%H%M%S)-hostname"
 
-export PROJECT_ROOT=$(dirname $(dirname $RUN_SCRIPT))
+# this does not work at runtime for batch job
+# beacuse the script has been copied by SGE
+# to somewhere under /var/opt/sge/localhost
+# export PROJECT_ROOT=$(dirname $(dirname $RUN_SCRIPT))
+export PROJECT_ROOT=/home/ucapcjg/clusterdemo/
 export RESULTS_DIR=$PROJECT_ROOT/results/run-at-$RUN_AT
 
 # provenance subdir will where the current environment values and run argument 
@@ -55,10 +65,10 @@ module load python/3.9.6
 
 #******************************************************************************
 # set variables for arguments and executables
+#******************************************************************************
 
 # set, retrieve and/or calculate arguments forthe application
 export ARGUMENTS_FILE=$PROJECT_ROOT/arguments/arg-set-1.txt
-export SOURCE_IMAGE=$PROJECT_ROOT/data/image.png
 
 # interpret arguments supplied to this script
 # in this case the transformed argument will be passed through to the application program, 
@@ -72,7 +82,7 @@ fi
 # select the executable file of the application to be run
 # here is a simple assignment
 export PY_EXECUTABLE=$PROJECT_ROOT/src/hostname.py
-export PY_EXECUTABLE_ARGUMENTS="-S $SHAPE -A $ARGUMENTS_FILE -I $SOURCE_IMAGE"
+export PY_EXECUTABLE_ARGUMENTS="-S $SHAPE -A $ARGUMENTS_FILE"
 
 # set any arguments for mpi - e.g. for mapping hosts/cores to mpi ranks/slots, communications tweaking 
 # here the gerun script takes care of all that for you.
@@ -81,6 +91,7 @@ MPI_ARGS=
 
 #******************************************************************************
 # note some items of provenance
+#******************************************************************************
 # environment:
 module list 2> $RESULTS_DIR/provenance/modules.log
 env > $RESULTS_DIR/provenance/env.log
@@ -100,7 +111,9 @@ if [[ ! -z "$PE_HOSTFILE" ]]; then
 fi
 
 # application software:
-# TODO note git hash
+cd $PROJECT_ROOT
+git show > $RESULTS_DIR/provenance/git_show.log
+cd -
 
 # if executable file is a compliled code then could do this to record dynamic libraries in use
 # ldd <executable> > $RESULTS_DIR/provenance/ldd.log
@@ -124,16 +137,17 @@ done
 cpuinfo > $RESULTS_DIR/provenance/cpuinfo.log
 ibstat > $RESULTS_DIR/provenance/ibstat.log
 ifconfig > $RESULTS_DIR/provenance/ifconfig.log
-#******************************************************************************
 
+# and set those all to read only
+chmod 0444 $RESULTS_DIR/provenance/*
+
+#******************************************************************************
 # finally launch in all mpi processes with gerun, the local wrapper for mpi
+#******************************************************************************
 echo "Now calling: gerun $MPI_ARGS $PY_EXECUTABLE $PY_EXECUTABLE_ARGUMENTS ..."
 {
 gerun $MPI_ARGS $PY_EXECUTABLE $PY_EXECUTABLE_ARGUMENTS
-} > $RESULTS_DIR/$(basename $RUN_SCRIPT).stdout.log 2> $RESULTS_DIR/$(basename $RUN_SCRIPT).stderr.log
-
-# TODO - control where output files go.  e.g. with mpi args or tee output
-# TODO - think about how env is set on compute nodes
+} > $RESULTS_DIR/$(basename $PY_EXECUTABLE).stdout.log 2> $RESULTS_DIR/$(basename $PY_EXECUTABLE).stderr.log
 
 # run post processing 
 
@@ -146,14 +160,17 @@ mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.o${JOB_ID} $RESULTS_DIR/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.e${JOB_ID} $RESULTS_DIR/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.po${JOB_ID} $RESULTS_DIR/
 mv /home/ucapcjg/Scratch/workspace/${JOB_NAME}.pe${JOB_ID} $RESULTS_DIR/
+find $RESULTS_DIR -type f -exec chmod 0444 {} \;
+chmod +x $RESULTS_DIR/gather_batch_job_stdout.sh
 EOF
-chmod +x $RESULTS_FILE/gather_batch_job_stdout.sh
+chmod +x $RESULTS_DIR/gather_batch_job_stdout.sh
 
 # drop any handy scripts in among the results files - e.g. a python notebook
 
 
-
-
 # tidy up unwanted files.
 
+# preserve the results - mark read only
+find $RESULTS_DIR -type f -exec chmod 0444 {} \;
+chmod +x $RESULTS_DIR/gather_batch_job_stdout.sh
 
