@@ -10,7 +10,7 @@
 # Request 15 gigabyte of TMPDIR space (default is 10 GB - remove if cluster is diskless)
 ##$ -l tmpfs=15G  # commented out - see below
 
-#$ -pe smp 4
+#$ -pe smp 1
 
 # Set the name of the job.
 #$ -N alltheargs
