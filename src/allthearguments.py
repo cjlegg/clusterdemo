@@ -15,7 +15,7 @@ import argparse
 def ultimate_answer(argument_dict):
     print('*' * 80)
     print('Entering the workings of the ultimate answer function ...')
-    print('The arguments supplied for this momentus calculation were:')
+    print('The arguments supplied for this momentous calculation were:')
     print(argument_dict)
     print('I would engage in some pointless calculation based on those parameters')
     print('but I think you can guess the that the answer is 42')
