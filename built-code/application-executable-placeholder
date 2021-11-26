@@ -1,0 +1,3 @@
+# binary executable files built by your build script will go here
+# there will be none if you are using an application already available on the system, e.g. in a module
+# this example has no binaries because the example application is in python, which is interpreted!
