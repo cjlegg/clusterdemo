@@ -32,3 +32,9 @@ qrsh -pe mpi 80 -l mem=512M,h_rt=0:30:00 -now yes
 
 # gerun
 cat $(which gerun)
+
+# pi calculation 
+qsub ~/clusterdemo/run-scripts-myriad-cluster/batch-pi-calc-gerun-simple.sh 10000000000
+
+
+
