@@ -2,7 +2,7 @@
 # adapted from https://www.rc.ucl.ac.uk/docs/Example_Jobscripts/
 
 # Request ten minutes of wallclock time (format hours:minutes:seconds).
-#$ -l h_rt=0:10:0
+#$ -l h_rt=1:00:0
 
 # Request 1 gigabyte of RAM (must be an integer followed by M, G, or T)
 #$ -l mem=10G
@@ -134,7 +134,7 @@ done
 } > $RESULTS_DIR/provenance/arguments.log
 
 # record hardware
-cpuinfo > $RESULTS_DIR/provenance/cpuinfo.log
+cat /proc/cpuinfo > $RESULTS_DIR/provenance/cpuinfo.log
 ibstat > $RESULTS_DIR/provenance/ibstat.log
 ifconfig > $RESULTS_DIR/provenance/ifconfig.log
 
@@ -145,9 +145,11 @@ chmod 0444 $RESULTS_DIR/provenance/*
 # finally launch in all mpi processes with gerun, the local wrapper for mpi
 #******************************************************************************
 echo "Now calling: gerun $MPI_ARGS $PY_EXECUTABLE $PY_EXECUTABLE_ARGUMENTS ..."
+echo "Begin at: " $(date)
 {
 gerun $MPI_ARGS $PY_EXECUTABLE $PY_EXECUTABLE_ARGUMENTS
 } > $RESULTS_DIR/$(basename $PY_EXECUTABLE).stdout.log 2> $RESULTS_DIR/$(basename $PY_EXECUTABLE).stderr.log
+echo "End at  : " $(date)
 
 # run post processing 
 

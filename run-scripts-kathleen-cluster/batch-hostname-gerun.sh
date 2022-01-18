@@ -134,7 +134,7 @@ done
 } > $RESULTS_DIR/provenance/arguments.log
 
 # record hardware
-cpuinfo > $RESULTS_DIR/provenance/cpuinfo.log
+cat /proc/cpuinfo > $RESULTS_DIR/provenance/cpuinfo.log
 ibstat > $RESULTS_DIR/provenance/ibstat.log
 ifconfig > $RESULTS_DIR/provenance/ifconfig.log
 
