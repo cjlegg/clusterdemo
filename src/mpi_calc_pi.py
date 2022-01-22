@@ -4,7 +4,7 @@ import math
 import argparse
 
 def arguments_from_command_line():
-    parser = argparse.ArgumentParser(description='An short program to calculate pi using the Lebnitz series.', prog='mpi_calc_pi.py')
+    parser = argparse.ArgumentParser(description='A short program to calculate pi using the Lebnitz series.', prog='mpi_calc_pi.py')
     parser.add_argument('--number-terms', nargs='?', required=True, help='number of terms of the Leibnitz series to include (required)')
     return vars(parser.parse_args())
 
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     if rank == 0:
         print('This is rank 0. There are {} ranks in total.'.format(ranks), file=sys.stderr)
 
-    # set up for approx the number of terms in the series specified (all ranks will calculate and equal number) 
+    # set up for approx the number of terms in the series specified (all ranks will calculate an equal number) 
     arguments = arguments_from_command_line()
     print('This is rank {}. Arguments for this run are: {}.'.format(rank, arguments), file=(sys.stdout if rank == 0 else sys.stderr))
     step = int(arguments['number_terms']) // ranks 
